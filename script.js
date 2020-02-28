@@ -12,19 +12,27 @@ var inventory = ["", "", "", "", "", "", "", "", ""];
 
 function spawnEntity(mobSpawnRate, rockSpawnRate){
     var randomN = Math.ceil(Math.random() * 100);
-    if(randomN > mobSpawnRate + rockSpawnRate){
+    if(randomN <= mobSpawnRate){
+        console.log("mob");
+        return "mob";
+    }else if(randomN <= mobSpawnRate + rockSpawnRate){
+        console.log("rock");
+        return "rock";
+    }else{
         console.log("empty");
         return "empty";
     }
-    if(randomN <= rockSpawnRate && randomN > mobSpawnRate){
-        console.log("rock");
-        return "rock";
-    }
-    console.log("mob");
-    return "mob;"
 }
 
-$(".")
+function appendObstacles(grid, column, row){
+    if(grid[column][row] === "empty"){
+        $(`.${column}.0${row}`).css("background-color", "white");
+    }else if(grid[column][row] === "rock"){
+        $(`.${column}.0${row}`).css("background-color", "gray");
+    }else if(grid[column][row] === "mob"){
+        $(`.${column}.0${row}`).css("background-color", "red");
+    }
+}
 
 function makeGrid(width, length, size) {
     for (var i = 0; i < width; i++) {
@@ -32,16 +40,15 @@ function makeGrid(width, length, size) {
         z.push([]);
         for (var j = 0; j < length; j++) {
             $(`#column${i}`).append(`<div class='box ${i} 0${j}'></div>`);
-            z[i].push("empty");
+            z[i].push(spawnEntity(5, 10));
+            appendObstacles(z, i, j);
         }
         $(".container").append("</div>");
         $(".box").css({"width": `${size}px`, "height": `${size}px`});
     }
 }
 
-
-
-makeGrid(20, 20, 20);
+makeGrid(10, 10, 20);
 xLoc = 0;
 yLoc = z[0].length - 1;
 playerLoc(xLoc, yLoc);
@@ -55,22 +62,22 @@ function clearPath(x, y) {
 }
 
 $("body").keydown(function(e) {
-    if (e.key === "ArrowRight" && xLoc != z[0].length - 1) {
+    if (e.key === "ArrowRight" && xLoc != z[0].length - 1 && z[xLoc + 1][yLoc] === "empty") {
         clearPath(xLoc, yLoc);
         xLoc = xLoc + 1;
         playerLoc(xLoc, yLoc);
     }
-    if (e.key === "ArrowLeft" && xLoc != 0) {
+    if (e.key === "ArrowLeft" && xLoc != 0 && z[xLoc - 1][yLoc] === "empty") {
         clearPath(xLoc, yLoc);
         xLoc = xLoc - 1;
         playerLoc(xLoc, yLoc);
     }
-    if (e.key === "ArrowDown" && yLoc != z.length - 1) {
+    if (e.key === "ArrowDown" && yLoc != z.length - 1 && z[xLoc][yLoc + 1] === "empty") {
         clearPath(xLoc, yLoc);
         yLoc = yLoc + 1;
         playerLoc(xLoc, yLoc);
     }
-    if (e.key === "ArrowUp" && yLoc != 0) {
+    if (e.key === "ArrowUp" && yLoc != 0 && z[xLoc][yLoc - 1] === "empty") {
         clearPath(xLoc, yLoc);
         yLoc = yLoc - 1;
         playerLoc(xLoc, yLoc);
