@@ -5,6 +5,8 @@ var level = 0;
 var difficulty = 0;
 var direction = "right";
 
+// i = x = column, j = y = row
+
 function spawnEntity(mobSpawnRate, rockSpawnRate){
     var randomN = Math.ceil(Math.random() * 100);
     if(randomN <= mobSpawnRate){
@@ -46,6 +48,47 @@ function appendObstacles(grid, column, row){
         $(`.${column}.0${row}`).css("background-color", "gray");
     }else if(grid[column][row] === "mob"){
         $(`.${column}.0${row}`).css("background-color", "red");
+    }
+}
+
+function moveEntity(){
+    for(var i = 0; i < z.length; i++){
+        for(var j = 0; j < z[0].length; j++){
+            if(z[i][j] === "mob"){
+                var randomDi = Math.ceil(Math.random() * 4);
+                if(randomDi === 1){
+                    if(i !== z.length - 1 && z[i + 1][j] === "empty"){
+                        clearPath(i, j);
+                        $(`.${i + 1}.0${j}`).css("background-color", "red");
+                    }
+                }
+                if(randomDi === 2){
+                    if(i !== 0 && z[i - 1][j] === "empty"){
+                        clearPath(i, j);
+                        $(`.${i - 1}.0${j}`).css("background-color", "red");
+                    }
+                }
+                if(randomDi === 3){
+                    if(j !== z[0].length - 1 && z[i][j + 1] === "empty"){
+                        clearPath(i, j);
+                        $(`.${i}.0${j + 1}`).css("background-color", "red");
+                    }
+                }
+                if(randomDi === 4){
+                    if(j !== 0 && z[i][j - 1] === "empty"){
+                        clearPath(i, j);
+                        $(`.${i}.0${j - 1}`).css("background-color", "red");
+                    }
+                }
+            }
+        }
+    }
+    for(var i = 0; i < z.length; i++){
+        for(var j = 0; j < z[0].length; j++){
+            if($(`.${i}.0${j}`).css("background-color") === "rgb(255, 0, 0)"){
+                z[i][j] = "mob";
+            }
+        }
     }
 }
 
@@ -101,38 +144,46 @@ function clearPath(x, y){
 
 nextLevel();
 
+setInterval(
+    
+)
+
 $("body").keydown(function(e){
     if(e.key === "ArrowRight"){
-        if(xLoc != z.length - 1 && z[xLoc + 1][yLoc] === "empty"){
+        if(xLoc !== z.length - 1 && z[xLoc + 1][yLoc] === "empty"){
             clearPath(xLoc, yLoc);
             xLoc = xLoc + 1;
             playerLoc(xLoc, yLoc);
         }
         direction = "right";
+        moveEntity();
     }
     if(e.key === "ArrowLeft"){
-        if(xLoc != 0 && z[xLoc - 1][yLoc] === "empty"){
+        if(xLoc !== 0 && z[xLoc - 1][yLoc] === "empty"){
             clearPath(xLoc, yLoc);
             xLoc = xLoc - 1;
             playerLoc(xLoc, yLoc);
         }
         direction = "left";
+        moveEntity();
     }
     if(e.key === "ArrowDown"){
-        if(yLoc != z[0].length - 1 && z[xLoc][yLoc + 1] === "empty"){
+        if(yLoc !== z[0].length - 1 && z[xLoc][yLoc + 1] === "empty"){
             clearPath(xLoc, yLoc);
             yLoc = yLoc + 1;
             playerLoc(xLoc, yLoc);
         }
         direction = "down";
+        moveEntity();
     }
     if(e.key === "ArrowUp"){
-        if(yLoc != 0 && z[xLoc][yLoc - 1] === "empty"){
+        if(yLoc !== 0 && z[xLoc][yLoc - 1] === "empty"){
             clearPath(xLoc, yLoc);
             yLoc = yLoc - 1;
             playerLoc(xLoc, yLoc);
         }
         direction = "up";
+        moveEntity();
     }
     if(e.shiftKey){
         destroyEntity(xLoc, yLoc);
