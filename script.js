@@ -1,26 +1,17 @@
-var sprites = {
-    caveFloor: "https://lh3.googleusercontent.com/proxy/t0lwYjv136INYhy3X5OEoQpBz5AqCl7mmaDUAZlGVoUqEp2b3fXHQQNDjnb0IYINxEYQF8zCzF4BL5_M_UtBceX40-Jg0HOo9mScMfA0b07F",
-    bat: "https://www.stickpng.com/assets/thumbs/58e33ab625b2455e1b159d7b.png",
-    miner: "https://i.ya-webdesign.com/images/calif-transparent-cartoon-6.gif",
-    rock: "https://lh3.googleusercontent.com/proxy/YqiqsmyPKbck4gnJiaSROW9kfFa09mrHM0a2Eeio_toe9gnikbpRxJIERt4RsRzBT2Kd-TvI8MUMEQL9OMOtZ-zMsmzFF5awDURbUoYhlRUD7x3zBETZWVAnbLUfNuyaiT99JfYBAjE4uSpSmQ"
-};
 var z = [];
 var xLoc = 0;
 var yLoc = 0;
-var level = 1;
+var level = 0;
+var difficulty = 0;
 var direction = "right";
-var inventory = ["", "", "", "", "", "", "", "", ""];
 
 function spawnEntity(mobSpawnRate, rockSpawnRate){
     var randomN = Math.ceil(Math.random() * 100);
     if(randomN <= mobSpawnRate){
-        console.log("mob");
         return "mob";
     }else if(randomN <= mobSpawnRate + rockSpawnRate){
-        console.log("rock");
         return "rock";
     }else{
-        console.log("empty");
         return "empty";
     }
 }
@@ -28,7 +19,7 @@ function spawnEntity(mobSpawnRate, rockSpawnRate){
 function isEmpty(grid){
     for(var i = 0; i < grid.length; i++){
         for(var j = 0; j < grid[0].length; j++){
-            if(grid[i][j] != "empty" || grid[i][j] != "player"){
+            if(grid[i][j] !== "empty" && grid[i][j] !== "player"){
                 return false;
             }
         }
@@ -38,12 +29,12 @@ function isEmpty(grid){
 
 function spawnLadder(grid){
     if(isEmpty(grid)){
-        if(grid[0][grid.length - 1] != "player"){
-            $(`.0.0${grid.length - 1}`).css("background-color", "brown");
-            grid[0][grid.length - 1] = "ladder";
-        } else {
+        if(grid[0][grid[0].length - 1] === "player"){
             $(`.${grid.length - 1}.00`).css("background-color", "brown");
             grid[grid.length - 1][0] = "ladder";
+        } else {
+            $(`.0.0${grid[0].length - 1}`).css("background-color", "brown");
+            grid[0][grid[0].length - 1] = "ladder";
         }
     }
 }
@@ -58,11 +49,11 @@ function appendObstacles(grid, column, row){
     }
 }
 
-function makeGrid(width, length, size) {
-    for (var i = 0; i < width; i++) {
+function makeGrid(width, length, size){
+    for (var i = 0; i < width; i++){
         $(".container").append(`<div id='column${i}'>`);
         z.push([]);
-        for (var j = 0; j < length; j++) {
+        for (var j = 0; j < length; j++){
             $(`#column${i}`).append(`<div class='box ${i} 0${j}'></div>`);
             z[i].push(spawnEntity(5, 10));
             appendObstacles(z, i, j);
@@ -72,41 +63,47 @@ function makeGrid(width, length, size) {
     }
 }
 
-function destroyEntity(x, y) {
-    if(direction === "right"){
+function destroyEntity(x, y){
+    if(direction === "right" && z[x + 1][y] !== "ladder"){
         clearPath(x + 1, y);
-        z[x + 1][y] = "empty";
     }
-    if(direction === "left"){
+    if(direction === "left"  && z[x - 1][y] !== "ladder"){
         clearPath(x - 1, y);
-        z[x - 1][y] = "empty";
     }
-    if(direction === "down"){
+    if(direction === "down"  && z[x][y + 1] !== "ladder"){
         clearPath(x, y + 1);
-        z[x][y + 1] = "empty";
     }
-    if(direction === "up"){
+    if(direction === "up"  && z[x][y - 1] !== "ladder"){
         clearPath(x, y - 1);
-        z[x][y - 1] = "empty";
     }
 }
 
-makeGrid(4, 4, 50);
-xLoc = 0;
-yLoc = z[0].length - 1;
-playerLoc(xLoc, yLoc);
+function nextLevel(){
+    z = [];
+    $(".container").empty();
+    level = level + 1;
+    difficulty = Math.floor(5 + (level)/5);
+    makeGrid(difficulty, difficulty, 50);
+    xLoc = 0;
+    yLoc = z[0].length - 1;
+    playerLoc(xLoc, yLoc);
+}
 
-function playerLoc(x, y) {
+function playerLoc(x, y){
     $(`.${x}.0${y}`).css("background-color", "black");
+    z[x][y] = "player";
 }
 
-function clearPath(x, y) {
+function clearPath(x, y){
     $(`.${x}.0${y}`).css("background-color", "white");
+    z[x][y] = "empty";
 }
 
-$("body").keydown(function(e) {
+nextLevel();
+
+$("body").keydown(function(e){
     if(e.key === "ArrowRight"){
-        if(xLoc != z[0].length - 1 && z[xLoc + 1][yLoc] === "empty"){
+        if(xLoc != z.length - 1 && z[xLoc + 1][yLoc] === "empty"){
             clearPath(xLoc, yLoc);
             xLoc = xLoc + 1;
             playerLoc(xLoc, yLoc);
@@ -122,7 +119,7 @@ $("body").keydown(function(e) {
         direction = "left";
     }
     if(e.key === "ArrowDown"){
-        if(yLoc != z.length - 1 && z[xLoc][yLoc + 1] === "empty"){
+        if(yLoc != z[0].length - 1 && z[xLoc][yLoc + 1] === "empty"){
             clearPath(xLoc, yLoc);
             yLoc = yLoc + 1;
             playerLoc(xLoc, yLoc);
@@ -139,6 +136,10 @@ $("body").keydown(function(e) {
     }
     if(e.shiftKey){
         destroyEntity(xLoc, yLoc);
+        isEmpty(z);
         spawnLadder(z);
+        if((xLoc === 0 && z[xLoc][yLoc + 1] === "ladder" && direction === "down") || (xLoc === z.length - 1 && z[xLoc][yLoc - 1] === "ladder" && direction === "up") || (yLoc === 0 && z[xLoc + 1][yLoc] === "ladder" && direction === "right") || (yLoc === z[0].length - 1 && z[xLoc - 1][yLoc] === "ladder" && direction === "left")){
+            nextLevel();
+        }
     }
 });
