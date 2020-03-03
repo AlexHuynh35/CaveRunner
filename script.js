@@ -144,9 +144,9 @@ function clearPath(x, y){
 
 nextLevel();
 
-setInterval(
-    
-)
+setInterval(function(){
+    moveEntity();
+}, 1500);
 
 $("body").keydown(function(e){
     if(e.key === "ArrowRight"){
@@ -156,7 +156,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "right";
-        moveEntity();
     }
     if(e.key === "ArrowLeft"){
         if(xLoc !== 0 && z[xLoc - 1][yLoc] === "empty"){
@@ -165,7 +164,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "left";
-        moveEntity();
     }
     if(e.key === "ArrowDown"){
         if(yLoc !== z[0].length - 1 && z[xLoc][yLoc + 1] === "empty"){
@@ -174,7 +172,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "down";
-        moveEntity();
     }
     if(e.key === "ArrowUp"){
         if(yLoc !== 0 && z[xLoc][yLoc - 1] === "empty"){
@@ -183,7 +180,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "up";
-        moveEntity();
     }
     if(e.shiftKey){
         destroyEntity(xLoc, yLoc);
