@@ -3,7 +3,7 @@ var xLoc = 0;
 var yLoc = 0;
 var level = 0;
 var difficulty = 0;
-var direction = "right";
+var direction = "Right";
 
 // i = x = column, j = y = row
 
@@ -107,16 +107,16 @@ function makeGrid(width, length, size){
 }
 
 function destroyEntity(x, y){
-    if(direction === "right" && z[x + 1][y] !== "ladder"){
+    if(direction === "Right" && z[x + 1][y] !== "ladder"){
         clearPath(x + 1, y);
     }
-    if(direction === "left"  && z[x - 1][y] !== "ladder"){
+    if(direction === "Left"  && z[x - 1][y] !== "ladder"){
         clearPath(x - 1, y);
     }
-    if(direction === "down"  && z[x][y + 1] !== "ladder"){
+    if(direction === "Down"  && z[x][y + 1] !== "ladder"){
         clearPath(x, y + 1);
     }
-    if(direction === "up"  && z[x][y - 1] !== "ladder"){
+    if(direction === "Up"  && z[x][y - 1] !== "ladder"){
         clearPath(x, y - 1);
     }
 }
@@ -130,6 +130,8 @@ function nextLevel(){
     xLoc = 0;
     yLoc = z[0].length - 1;
     playerLoc(xLoc, yLoc);
+    $("#level").text(level);
+    $("#direction").text(direction);
 }
 
 function playerLoc(x, y){
@@ -155,7 +157,9 @@ $("body").keydown(function(e){
             xLoc = xLoc + 1;
             playerLoc(xLoc, yLoc);
         }
-        direction = "right";
+        direction = "Right";
+        console.log(direction);
+        $("#direction").text(direction);
     }
     if(e.key === "ArrowLeft"){
         if(xLoc !== 0 && z[xLoc - 1][yLoc] === "empty"){
@@ -163,7 +167,9 @@ $("body").keydown(function(e){
             xLoc = xLoc - 1;
             playerLoc(xLoc, yLoc);
         }
-        direction = "left";
+        direction = "Left";
+        console.log(direction);
+        $("#direction").text(direction);
     }
     if(e.key === "ArrowDown"){
         if(yLoc !== z[0].length - 1 && z[xLoc][yLoc + 1] === "empty"){
@@ -171,7 +177,9 @@ $("body").keydown(function(e){
             yLoc = yLoc + 1;
             playerLoc(xLoc, yLoc);
         }
-        direction = "down";
+        direction = "Down";
+        console.log(direction);
+        $("#direction").text(direction);
     }
     if(e.key === "ArrowUp"){
         if(yLoc !== 0 && z[xLoc][yLoc - 1] === "empty"){
@@ -179,13 +187,15 @@ $("body").keydown(function(e){
             yLoc = yLoc - 1;
             playerLoc(xLoc, yLoc);
         }
-        direction = "up";
+        direction = "Up";
+        console.log(direction);
+        $("#direction").text(direction);
     }
     if(e.shiftKey){
         destroyEntity(xLoc, yLoc);
         isEmpty(z);
         spawnLadder(z);
-        if((xLoc === 0 && z[xLoc][yLoc + 1] === "ladder" && direction === "down") || (xLoc === z.length - 1 && z[xLoc][yLoc - 1] === "ladder" && direction === "up") || (yLoc === 0 && z[xLoc + 1][yLoc] === "ladder" && direction === "right") || (yLoc === z[0].length - 1 && z[xLoc - 1][yLoc] === "ladder" && direction === "left")){
+        if((xLoc === 0 && z[xLoc][yLoc + 1] === "ladder" && direction === "Down") || (xLoc === z.length - 1 && z[xLoc][yLoc - 1] === "ladder" && direction === "Up") || (yLoc === 0 && z[xLoc + 1][yLoc] === "ladder" && direction === "Right") || (yLoc === z[0].length - 1 && z[xLoc - 1][yLoc] === "ladder" && direction === "Left")){
             nextLevel();
         }
     }
