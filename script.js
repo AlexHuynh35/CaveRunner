@@ -1,11 +1,16 @@
 var z = [];
 var xLoc = 0;
 var yLoc = 0;
+var health = 100;
+var gold = 0;
 var level = 0;
 var difficulty = 0;
 var direction = "Right";
 
 // i = x = column, j = y = row
+
+$(".health").css("width", `${health}%`);
+$(".money").css("width", `${gold}%`);
 
 function spawnEntity(mobSpawnRate, rockSpawnRate){
     var randomN = Math.ceil(Math.random() * 100);
@@ -61,11 +66,25 @@ function moveEntity(){
                         clearPath(i, j);
                         $(`.${i + 1}.0${j}`).css("background-color", "red");
                     }
+                    if(i !== z.length - 1 && z[i + 1][j] === "player"){
+                        health = health - 10;
+                        if(health < 0){
+                            health = 0;
+                        }
+                        $(".health").css("width", `${health}%`);
+                    }
                 }
                 if(randomDi === 2){
                     if(i !== 0 && z[i - 1][j] === "empty"){
                         clearPath(i, j);
                         $(`.${i - 1}.0${j}`).css("background-color", "red");
+                    }
+                    if(i !== 0 && z[i - 1][j] === "player"){
+                        health = health - 10;
+                        if(health < 0){
+                            health = 0;
+                        }
+                        $(".health").css("width", `${health}%`);
                     }
                 }
                 if(randomDi === 3){
@@ -73,11 +92,25 @@ function moveEntity(){
                         clearPath(i, j);
                         $(`.${i}.0${j + 1}`).css("background-color", "red");
                     }
+                    if(j !== z[0].length - 1 && z[i][j + 1] === "player"){
+                        health = health - 10;
+                        if(health < 0){
+                            health = 0;
+                        }
+                        $(".health").css("width", `${health}%`);
+                    }
                 }
                 if(randomDi === 4){
                     if(j !== 0 && z[i][j - 1] === "empty"){
                         clearPath(i, j);
                         $(`.${i}.0${j - 1}`).css("background-color", "red");
+                    }
+                    if(j !== 0 && z[i][j - 1] === "player"){
+                        health = health - 10;
+                        if(health < 0){
+                            health = 0;
+                        }
+                        $(".health").css("width", `${health}%`);
                     }
                 }
             }
@@ -108,15 +141,43 @@ function makeGrid(width, length, size){
 
 function destroyEntity(x, y){
     if(direction === "Right" && z[x + 1][y] !== "ladder"){
+        if(z[x + 1][y] === "rock"){
+            gold = gold + 5;
+            if(gold > 100){
+                gold = 100;
+            }
+            $(".money").css("width", `${gold}%`);
+        }
         clearPath(x + 1, y);
     }
     if(direction === "Left"  && z[x - 1][y] !== "ladder"){
+        if(z[x - 1][y] === "rock"){
+            gold = gold + 5;
+            if(gold > 100){
+                gold = 100;
+            }
+            $(".money").css("width", `${gold}%`);
+        }
         clearPath(x - 1, y);
     }
     if(direction === "Down"  && z[x][y + 1] !== "ladder"){
+        if(z[x][y + 1] === "rock"){
+            gold = gold + 5;
+            if(gold > 100){
+                gold = 100;
+            }
+            $(".money").css("width", `${gold}%`);
+        }
         clearPath(x, y + 1);
     }
     if(direction === "Up"  && z[x][y - 1] !== "ladder"){
+        if(z[x][y - 1] === "rock"){
+            gold = gold + 5;
+            if(gold > 100){
+                gold = 100;
+            }
+            $(".money").css("width", `${gold}%`);
+        }
         clearPath(x, y - 1);
     }
 }
@@ -132,6 +193,17 @@ function nextLevel(){
     playerLoc(xLoc, yLoc);
     $("#level").text(level);
     $("#direction").text(direction);
+}
+
+function restartGame(){
+    health = 100;
+    gold = 0;
+    $(".health").css("width", `${health}%`);
+    $(".money").css("width", `${gold}%`);
+    level = 0;
+    difficulty = 0;
+    direction = "Right";
+    nextLevel();
 }
 
 function playerLoc(x, y){
@@ -150,6 +222,17 @@ setInterval(function(){
     moveEntity();
 }, 1500);
 
+setInterval(function(){
+    if(health <= 0){
+        alert("Game Over");
+        restartGame();
+    }
+    else if(gold >= 100){
+        alert("You Win");
+        restartGame();
+    }
+}, 1000);
+
 $("body").keydown(function(e){
     if(e.key === "ArrowRight"){
         if(xLoc !== z.length - 1 && z[xLoc + 1][yLoc] === "empty"){
@@ -158,7 +241,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "Right";
-        console.log(direction);
         $("#direction").text(direction);
     }
     if(e.key === "ArrowLeft"){
@@ -168,7 +250,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "Left";
-        console.log(direction);
         $("#direction").text(direction);
     }
     if(e.key === "ArrowDown"){
@@ -178,7 +259,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "Down";
-        console.log(direction);
         $("#direction").text(direction);
     }
     if(e.key === "ArrowUp"){
@@ -188,7 +268,6 @@ $("body").keydown(function(e){
             playerLoc(xLoc, yLoc);
         }
         direction = "Up";
-        console.log(direction);
         $("#direction").text(direction);
     }
     if(e.shiftKey){
@@ -199,4 +278,8 @@ $("body").keydown(function(e){
             nextLevel();
         }
     }
+});
+
+$(".restart").click(function(){
+    restartGame();
 });

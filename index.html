@@ -4,16 +4,28 @@
         <link type="text/css" rel="stylesheet" href="style.css">
     </head>
     <body>
+        <div class="heading">
+            <h1>Cave Runner</h1>
+        </div>
         <div class="utilities">
             <div class="bars">
                 <div class="totalHealth">
+                    <div class="text">HP</div>
                     <div class="health"></div>
-                    <div class="level">Level: <span id="level"></span></div>
                 </div>
+                <button class="restart">Restart Game</button>
                 <div class="totalMoney">
+                    <div class="text">$</div>
                     <div class="money"></div>
-                    <div class="direction">Direction: <span id="direction"></span></div>
                 </div>
+            </div>
+            <div class="information">
+                <div class="level">Level: <span id="level"></span></div>
+                <div class="direction">Direction: <span id="direction"></span></div>
+            </div>
+            <div class="control">
+                <p>Arrow Keys to Move, Shift to Interact</p>
+                <p>Black = You, Gray = Ore, Red = Mob</p>
             </div>
         <div>
         <div class="container">
